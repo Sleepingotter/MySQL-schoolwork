@@ -45,3 +45,21 @@ insert into v_student (SId,SName,RDate) values("S100","罗浩","2001-11-12");
 select * from student;
 
 update v_student set SName = "唐建华" where SId = "S006";
+
+create or replace view v_student as select student.SId,student.SName,register.RDate from register left join student on register.SId = student.Sid where year(register.RDate) >= 1998 with check option;
+
+insert into v_student value("S101","林海","1995-02-02");
+# 插入不成功，因为该视图已经添加了with check option 插入的数据需要满足条件
+
+create view v_s as select Sid, SName, SBirth from student where student.SGender = "男";
+select * from v_s;
+
+update v_s set SName = "王春宇" where Sid = "S001";
+select * from student;
+
+delete from v_s where Sid = "S002";
+select * from student;
+
+desc v_student;
+
+drop view v_student;
