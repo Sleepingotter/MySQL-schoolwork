@@ -1,6 +1,6 @@
+use yggl;
 # (1)
 
-use yggl;
 select * from course;
 set @Java_CId := (select CId from course where CName = 'JAVA程序设计');
 #select * from register;
@@ -116,6 +116,59 @@ begin
 end;
 call upbirth('罗丽','2000-11-22');
 select * from student;
+
+# (4)
+
+create procedure stu_proc()
+#declare exit handler for sqlstate '02000' close s;
+begin
+	declare SSID,SSNAME,SSBIRTH char(10);
+  declare s cursor for select Sid ,SName,SBirth from student;
+	open s;
+	label: loop
+			FETCH s into SSID,SSNAME,SSBIRTH;
+			if SSID = 'S004' then
+					select SSNAME,SSBIRTH;
+					close s;
+					leave label;
+			end if;
+	
+	end loop label;
+end;
+call stu_proc();
+
+# (5)
+
+create procedure score_proc()
+begin 
+		
+		declare num int;
+		declare CCId char(10); 
+		declare c cursor for select CLimit,CId from course;
+		declare exit handler for not found close c;
+		open c;
+		label:loop
+				
+				fetch c into num,CCId;
+				case 
+						when num < 40 then
+								update course set CLimit = CLimit+30 where CCId = CId;
+								iterate label;
+						when num>=40 and num < 60 then
+								update course set CLimit = CLimit+20 where CCId = CId;
+								iterate label;
+						when num>=60 and num < 90 then
+								update course set CLimit = CLimit+10 where CCId = CId;
+								iterate label;		
+						else 
+							update course set CLimit =CLimit+ 5 where CCId = CId;
+				end case;
+		end loop label;
+end;
+call score_proc();
+
+
+
 
 
 
