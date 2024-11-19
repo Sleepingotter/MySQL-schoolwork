@@ -39,8 +39,8 @@ use yggl;
 create view v_student as select student.SId,student.SName,register.RDate from register left join student on register.SId = student.Sid where year(register.RDate) >= 1998;
 
 create view v_grade as select course.CName,max(register.Score),min(register.Score),avg(register.Score) from register left join course on register.CId = course.CId group by register.CId;
-
 #select * from v_student;
+
 insert into v_student (SId,SName,RDate) values("S100","罗浩","2001-11-12");
 select * from student;
 
@@ -63,3 +63,5 @@ select * from student;
 desc v_student;
 
 drop view v_student;
+
+drop view v_s;
