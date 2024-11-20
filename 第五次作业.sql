@@ -1,4 +1,5 @@
 use yggl;
+# 一、存储函数相关
 # (1)
 
 select * from course;
@@ -62,7 +63,8 @@ delimiter ;
 
 select casetwo(7),casetwo(14),casetwo(1);
 
-#(5)
+# 二、存储过程相关
+# (5)
 
 delimiter //
 create function dj_fn() returns char(10) deterministic
@@ -141,14 +143,12 @@ call stu_proc();
 
 create procedure score_proc()
 begin 
-		
 		declare num int;
 		declare CCId char(10); 
 		declare c cursor for select CLimit,CId from course;
 		declare exit handler for not found close c;
 		open c;
 		label:loop
-				
 				fetch c into num,CCId;
 				case 
 						when num < 40 then
@@ -166,6 +166,98 @@ begin
 		end loop label;
 end;
 call score_proc();
+
+# 三、触发器相关
+# (1)
+# desc register;
+CREATE TABLE `sc` (
+  `SId` char(4) NOT NULL COMMENT '学号',
+  `CId` char(3) NOT NULL COMMENT '课程名',
+  `Score` decimal(5,2) DEFAULT NULL COMMENT '成绩',
+  `RDate` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '选课时间',
+  PRIMARY KEY (`SId`,`CId`),
+  KEY `REG_CID` (`CId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='备份注册表';
+
+select * from register;
+
+insert into sc values
+('S001','C01',72.00,'2019-08-07 21:14:19'),
+('S001','C02',50.00,'2019-07-31 05:37:02'),
+('S002','C01',95.00,'2019-08-07 23:41:34'),
+('S002','C05',53.00,'2019-06-25 05:45:44'),
+('S002','C06',51.00,'2019-07-13 19:21:38'),
+('S002','C07',62.00,'2019-08-14 03:13:58'),
+('S003','C02',61.00,'2019-07-24 16:21:03'),
+('S003','C03',100.00,'2019-08-01 01:36:32');
+
+create trigger del_trig
+after delete on course for each row
+begin 
+	delete from sc where old.CId = CId;
+end;
+#show triggers;
+
+# (2)
+
+create trigger cno_tri
+after update on course for each row
+begin 
+	update register set CId = new.CId where CId = old.CId;
+end;
+
+# (3)
+
+create trigger tead_trig 
+before update on teacher for each row
+begin
+	if new.TGender not in('男','女') then
+			set new.TGender = old.TGender;
+	end if;
+end;
+
+# 四、事务与权限管理相关
+# (1)
+
+begin;
+update course set CName = 'PHP语言' where CId = 'C05';
+commit;
+
+# (2)
+
+create procedure auto_del()
+begin 
+		start transaction;
+		delete from course where CId = 'C04';
+		rollback;
+end;
+# drop procedure auto_del;
+call auto_del();
+
+# (3)
+
+create user 'ex_user'@'%' identified by '123456';
+# drop user 'ex_user'@'%';
+
+# (4)
+
+alter user 'ex_user'@'%' identified with mysql_native_password by '111111';
+
+# (5)
+
+grant delete on registration.student to 'ex_user'@'%';
+
+# (6)
+
+grant update on registration.student.SName to 'ex_user'@'%';
+
+
+
+
+
+
+
+
 
 
 
