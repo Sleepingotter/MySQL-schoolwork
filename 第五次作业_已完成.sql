@@ -251,8 +251,13 @@ grant delete on registration.student to 'ex_user'@'%';
 
 grant update on registration.student.SName to 'ex_user'@'%';
 
+# (7)
+grant execute on procedure cn_proc to 'ex_user'@'%'
 
-
+# (8)
+mysql -u ex_user -p111111;
+use yggl;
+call cn_proc;
 
 
 
